@@ -31,12 +31,12 @@ npm run dev
 광고 슬롯은 상단, 주문 패널, 뉴스 패널에 준비되어 있습니다. 실제 광고를 띄우려면 광고 네트워크 승인 후 GitHub 저장소의 `Settings > Secrets and variables > Actions > Variables`에 아래 값을 추가하세요.
 
 ```bash
-VITE_ADSENSE_CLIENT=ca-pub-...
+VITE_ADSENSE_CLIENT=ca-pub-3303941146778727
 VITE_ADSENSE_SLOT_TOP=...
 VITE_ADSENSE_SLOT_SIDE=...
 VITE_ADSENSE_SLOT_NEWS=...
 ```
 
-값이 없으면 광고 대신 플레이스홀더가 보입니다.
+AdSense client id는 기본값으로 코드에 들어가 있습니다. 슬롯 ID가 없으면 자동 광고 스크립트만 연결되고, 수동 광고 위치에는 플레이스홀더가 보입니다.
 
 실제 제도는 게임용으로 단순화되어 있습니다.
