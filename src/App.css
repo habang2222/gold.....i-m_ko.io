@@ -6,7 +6,8 @@
 
 .topbar,
 .portfolio-strip,
-.dashboard-grid {
+.dashboard-grid,
+.ad-slot-top {
   width: min(1540px, calc(100vw - 44px));
   margin: 0 auto;
 }
@@ -29,7 +30,8 @@
 .order-buttons,
 .news-row,
 .isa-box,
-.limit-box {
+.limit-box,
+.ad-slot {
   border: 1px solid var(--line);
   background: var(--panel);
   box-shadow: var(--shadow);
@@ -168,6 +170,64 @@ button {
   gap: 12px;
   margin-top: 16px;
   padding: 12px;
+}
+
+.ad-slot {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+  min-height: 96px;
+  padding: 12px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.ad-slot-top {
+  min-height: 92px;
+  margin-top: 16px;
+  background:
+    linear-gradient(90deg, rgba(44, 123, 229, 0.12), rgba(31, 169, 113, 0.08)),
+    var(--panel);
+}
+
+.ad-slot-side {
+  min-height: 250px;
+  margin-top: 12px;
+}
+
+.ad-slot-news {
+  min-height: 110px;
+  margin-top: 12px;
+}
+
+.ad-preview {
+  border-style: dashed;
+  background:
+    linear-gradient(135deg, rgba(238, 182, 77, 0.1), transparent 44%),
+    var(--panel-strong);
+}
+
+.ad-slot span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ad-slot strong {
+  color: var(--ink);
+}
+
+.ad-slot small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.adsbygoogle {
+  min-width: 100%;
+  min-height: 74px;
 }
 
 .metric {
@@ -937,7 +997,8 @@ button:focus-visible {
 
   .topbar,
   .portfolio-strip,
-  .dashboard-grid {
+  .dashboard-grid,
+  .ad-slot-top {
     width: 100%;
   }
 

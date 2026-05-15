@@ -26,4 +26,17 @@ npm run dev
 - 신규 상장, 세금/환율 계산기, 알림, 스크리너, 미션, 캘린더
 - 거래일 진행, 회사별 업무 성과, 뉴스 테이프, 섹터 열지도
 
+## 광고 설정
+
+광고 슬롯은 상단, 주문 패널, 뉴스 패널에 준비되어 있습니다. 실제 광고를 띄우려면 광고 네트워크 승인 후 GitHub 저장소의 `Settings > Secrets and variables > Actions > Variables`에 아래 값을 추가하세요.
+
+```bash
+VITE_ADSENSE_CLIENT=ca-pub-...
+VITE_ADSENSE_SLOT_TOP=...
+VITE_ADSENSE_SLOT_SIDE=...
+VITE_ADSENSE_SLOT_NEWS=...
+```
+
+값이 없으면 광고 대신 플레이스홀더가 보입니다.
+
 실제 제도는 게임용으로 단순화되어 있습니다.

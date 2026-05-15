@@ -24,6 +24,7 @@ import {
   Wallet,
 } from 'lucide-react'
 import './App.css'
+import { AdSlot } from './components/AdSlot'
 import { buildAppContent } from './game/appContent'
 import {
   ISA_ANNUAL_LIMIT,
@@ -207,6 +208,8 @@ function App() {
           </button>
         </div>
       </header>
+
+      <AdSlot placement="top" label="시장 브리핑 스폰서" />
 
       <section className="portfolio-strip" aria-label="계좌 요약">
         <Metric label="총 평가자산" value={formatWon(totalEquity)} icon={<Wallet size={18} />} />
@@ -400,6 +403,8 @@ function App() {
               100만원 입금
             </button>
           </div>
+
+          <AdSlot placement="side" label="투자 도구 스폰서" />
         </aside>
 
         <section className="news-panel panel large-panel">
@@ -420,6 +425,7 @@ function App() {
               <NewsRow key={item.id} item={item} />
             ))}
           </div>
+          <AdSlot placement="news" label="뉴스 테이프 스폰서" />
         </section>
 
         <section className="sector-panel panel">
