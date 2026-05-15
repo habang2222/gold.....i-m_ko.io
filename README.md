@@ -32,11 +32,11 @@ npm run dev
 
 ```bash
 VITE_ADSENSE_CLIENT=ca-pub-3303941146778727
-VITE_ADSENSE_SLOT_TOP=...
+VITE_ADSENSE_SLOT_TOP=2342953263
 VITE_ADSENSE_SLOT_SIDE=...
 VITE_ADSENSE_SLOT_NEWS=...
 ```
 
-AdSense client id는 기본값으로 코드에 들어가 있습니다. 슬롯 ID가 없으면 자동 광고 스크립트만 연결되고, 수동 광고 위치에는 플레이스홀더가 보입니다.
+AdSense client id와 상단 광고 슬롯 ID는 기본값으로 코드에 들어가 있습니다. 나머지 슬롯 ID가 없으면 자동 광고 스크립트만 연결되고, 수동 광고 위치에는 플레이스홀더가 보입니다.
 
 실제 제도는 게임용으로 단순화되어 있습니다.
