@@ -27,8 +27,14 @@ import './App.css'
 import { AdSlot } from './components/AdSlot'
 import { buildAppContent } from './game/appContent'
 import {
+  BANKRUPT_CASH_THRESHOLD_KRW,
+  BOOSTED_RESTART_CASH_KRW,
+  COMMISSION_RATE,
+  FOREIGN_COMMISSION_RATE,
+  FX_FEE_RATE,
   ISA_ANNUAL_LIMIT,
   ISA_TAX_FREE_LIMIT,
+  STARTING_CASH_KRW,
   TRANSACTION_TAX_RATE,
   accountEquity,
   advanceDay,
@@ -52,7 +58,7 @@ import {
   type NewsItem,
 } from './game/market'
 
-const SAVE_KEY = 'jusic-market-sim-v2'
+const SAVE_KEY = 'jusic-market-sim-v3'
 const EXCHANGE_FILTERS: Array<'ALL' | Exchange> = ['ALL', 'KOSPI', 'KOSDAQ', 'NASDAQ', 'NYSE', 'TSE', 'MOTHERS']
 
 function loadGame(): GameState {
@@ -89,11 +95,15 @@ function App() {
   const isaEquity = accountEquity(game.accounts.isa, game.companies, game.fx)
   const totalEquity = regularEquity + isaEquity
   const invested = portfolioValue(game.accounts.regular, game.companies, game.fx) + portfolioValue(game.accounts.isa, game.companies, game.fx)
+  const totalCash = game.accounts.regular.cash + game.accounts.isa.cash
   const holding = account.holdings[selectedCompany.ticker]
   const selectedFx = getFxRate(selectedCompany.currency, game.fx)
   const maxBuy = Math.floor(account.cash / Math.max(1, selectedCompany.price * selectedFx * 1.006))
   const maxSell = holding?.quantity ?? 0
   const sellEstimate = estimateSell(game, activeAccount, selectedCompany.ticker, Math.max(1, quantity))
+  const cheapestBuyCost = useMemo(() => cheapestOneShareCost(game), [game])
+  const hasAffordableStock = useMemo(() => canBuyAnyStock(game), [game])
+  const isBankrupt = totalCash <= BANKRUPT_CASH_THRESHOLD_KRW || !hasAffordableStock
   const content = useMemo(
     () =>
       buildAppContent(
@@ -153,14 +163,18 @@ function App() {
   }
 
   function reset() {
-    const next = resetGame()
+    restartWithCash(STARTING_CASH_KRW, '게임이 초기화되었습니다.')
+  }
+
+  function restartWithCash(startingCash: number, nextMessage: string) {
+    const next = resetGame(startingCash)
 
     setGame(next)
     setQuantity(10)
     setActiveAccount('regular')
     setSearch('')
     setExchangeFilter('ALL')
-    setMessage('게임이 초기화되었습니다.')
+    setMessage(nextMessage)
   }
 
   return (
@@ -515,6 +529,15 @@ function App() {
           </div>
         </section>
       </section>
+
+      {isBankrupt && (
+        <BankruptcyModal
+          cheapestBuyCost={cheapestBuyCost}
+          totalCash={totalCash}
+          onBoostedRestart={() => restartWithCash(BOOSTED_RESTART_CASH_KRW, '광고 후원 보너스로 100만원에서 다시 시작합니다.')}
+          onStandardRestart={() => restartWithCash(STARTING_CASH_KRW, '50만원에서 다시 시작합니다. 이번에는 분할 매수로 가보죠.')}
+        />
+      )}
     </main>
   )
 }
@@ -622,6 +645,50 @@ function AgencyCard({ agency }: { agency: NewsAgency }) {
   )
 }
 
+function BankruptcyModal({
+  cheapestBuyCost,
+  totalCash,
+  onBoostedRestart,
+  onStandardRestart,
+}: {
+  cheapestBuyCost: number
+  totalCash: number
+  onBoostedRestart: () => void
+  onStandardRestart: () => void
+}) {
+  return (
+    <div className="bankruptcy-overlay" role="dialog" aria-modal="true" aria-labelledby="bankruptcy-title">
+      <section className="bankruptcy-modal">
+        <div className="bankruptcy-copy">
+          <p className="eyebrow">계좌 위험 경보</p>
+          <h2 id="bankruptcy-title">당신은 주식은 절대 하지 마세요.....</h2>
+          <p>
+            남은 현금은 {formatWon(totalCash)}이고, 지금 시장에서 가장 싼 1주를 사려면 약 {formatWon(cheapestBuyCost)}가 필요합니다.
+          </p>
+        </div>
+
+        <div className="bankruptcy-stats">
+          <MiniStat label="남은 현금" value={formatWon(totalCash)} />
+          <MiniStat label="최저 1주 비용" value={formatWon(cheapestBuyCost)} />
+        </div>
+
+        <AdSlot placement="top" label="재시작 후원 광고" className="bankruptcy-ad" />
+
+        <div className="bankruptcy-actions">
+          <button type="button" className="restart-boost" onClick={onBoostedRestart}>
+            <Banknote size={18} />
+            광고 보고 100만원으로 시작하기
+          </button>
+          <button type="button" className="restart-basic" onClick={onStandardRestart}>
+            <RefreshCcw size={18} />
+            50만원으로 시작하기
+          </button>
+        </div>
+      </section>
+    </div>
+  )
+}
+
 function sectorSummary(companies: Company[]) {
   const buckets = new Map<string, { change: number; cap: number }>()
 
@@ -650,6 +717,29 @@ function statusClass(status: string) {
   if (status.includes('하한') || status.includes('주의') || status.includes('비상') || status.includes('폐지')) return 'risk'
   if (status.includes('VI') || status.includes('관리') || status.includes('신규')) return 'watch'
   return ''
+}
+
+function canBuyAnyStock(game: GameState) {
+  const accountCash = [game.accounts.regular.cash, game.accounts.isa.cash]
+
+  return game.companies
+    .filter((company) => company.alive)
+    .some((company) => accountCash.some((cash) => cash >= oneShareBuyCost(company, game)))
+}
+
+function cheapestOneShareCost(game: GameState) {
+  const costs = game.companies.filter((company) => company.alive).map((company) => oneShareBuyCost(company, game))
+
+  return costs.length > 0 ? Math.min(...costs) : 0
+}
+
+function oneShareBuyCost(company: Company, game: GameState) {
+  const tradeValueKrw = company.price * getFxRate(company.currency, game.fx)
+  const feeRate = company.country === 'KR' ? COMMISSION_RATE : FOREIGN_COMMISSION_RATE
+  const fee = Math.ceil(tradeValueKrw * feeRate)
+  const fxFee = company.country === 'KR' ? 0 : Math.ceil(tradeValueKrw * FX_FEE_RATE)
+
+  return tradeValueKrw + fee + fxFee
 }
 
 export default App

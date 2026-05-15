@@ -227,6 +227,9 @@ export const FOREIGN_GAIN_DEDUCTION = 2_500_000
 export const ISA_ANNUAL_LIMIT = 20_000_000
 export const ISA_TAX_FREE_LIMIT = 2_000_000
 export const ISA_LOW_TAX_RATE = 0.099
+export const STARTING_CASH_KRW = 500_000
+export const BOOSTED_RESTART_CASH_KRW = 1_000_000
+export const BANKRUPT_CASH_THRESHOLD_KRW = 1_000
 
 const START_DATE = '2026-05-18'
 
@@ -444,7 +447,7 @@ const MACRO_EVENTS: MacroEvent[] = [
   },
 ]
 
-export function createInitialGame(): GameState {
+export function createInitialGame(startingCash = STARTING_CASH_KRW): GameState {
   const rng = createRng(20260518)
   const companies = buildCompanyUniverse(rng)
 
@@ -454,8 +457,8 @@ export function createInitialGame(): GameState {
     seed: rng.seed,
     companies,
     accounts: {
-      regular: createAccount(50_000_000),
-      isa: { ...createAccount(8_000_000), isaContribution: 8_000_000 },
+      regular: createAccount(startingCash),
+      isa: createAccount(0),
     },
     agencies: AGENCIES.map((agency) => ({ ...agency })),
     news: [
@@ -467,7 +470,7 @@ export function createInitialGame(): GameState {
         sourceTicker: 'AMN',
         title: '모의거래소 80개 종목 동시 개장',
         detail:
-          '국내 대형주 20개와 중소형주 60개, 미국과 일본 가상 종목이 함께 거래를 시작했다. 해외 종목은 환율과 현지 장 분위기가 원화 평가액에 반영되며, 뉴스사의 예측 정확도도 별도 종목 가격에 영향을 준다.',
+          '국내 대형주 20개와 중소형주 60개, 미국과 일본 가상 종목이 함께 거래를 시작했다. 첫 자금은 50만원으로 제한되며, 해외 종목은 환율과 현지 장 분위기가 원화 평가액에 반영된다. 뉴스사의 예측 정확도도 별도 종목 가격에 영향을 준다.',
         tone: 'neutral',
         impact: 0,
         predictedDirection: 0,
@@ -809,8 +812,8 @@ export function estimateSell(state: GameState, accountType: AccountType, ticker:
   }
 }
 
-export function resetGame(): GameState {
-  return createInitialGame()
+export function resetGame(startingCash = STARTING_CASH_KRW): GameState {
+  return createInitialGame(startingCash)
 }
 
 export function portfolioValue(account: Account, companies: Company[], fx: FxRates = STARTING_FX) {

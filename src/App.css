@@ -759,6 +759,93 @@ button:focus-visible {
   border-radius: 8px;
 }
 
+.bankruptcy-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(4, 6, 9, 0.74);
+  backdrop-filter: blur(8px);
+}
+
+.bankruptcy-modal {
+  display: grid;
+  gap: 14px;
+  width: min(560px, 100%);
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(216, 77, 77, 0.16), transparent 42%),
+    var(--panel);
+  border: 1px solid rgba(216, 77, 77, 0.38);
+  border-radius: 8px;
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.46);
+}
+
+.bankruptcy-copy h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 26px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.bankruptcy-copy p:last-child {
+  margin: 10px 0 0;
+  color: var(--soft);
+  line-height: 1.5;
+}
+
+.bankruptcy-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bankruptcy-ad.ad-slot-top {
+  width: 100%;
+  min-height: 100px;
+  margin: 0;
+}
+
+.bankruptcy-actions {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 10px;
+}
+
+.bankruptcy-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.bankruptcy-actions button:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-blue);
+}
+
+.restart-boost {
+  background: rgba(238, 182, 77, 0.18);
+}
+
+.restart-basic {
+  background: var(--chip);
+}
+
 .calc-heading {
   display: inline-flex;
   align-items: center;
@@ -1043,5 +1130,10 @@ button:focus-visible {
 
   .relation-list small {
     display: none;
+  }
+
+  .bankruptcy-stats,
+  .bankruptcy-actions {
+    grid-template-columns: 1fr;
   }
 }
